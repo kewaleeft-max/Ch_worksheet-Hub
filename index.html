@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
     <!-- QRCodeJS Library CDN for dynamic QR Code generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Google Fonts: Fredoka, Noto Sans SC, Zhi Mang Xing, Ma Shan Zheng -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
@@ -523,7 +523,8 @@
         let isSlowSpeed = false;
         let isAdminLoggedIn = false;
         let inactivityTimer = null;
-        let traceCanvas, traceCtx;
+        let traceCanvas = null;
+        let traceCtx = null;
 
         const PASSCODE_STORAGE_KEY = 'baobao_admin_passcode_sha256';
 
@@ -532,15 +533,21 @@
             loadVocabularyStore();
             checkUrlQueryParams();
             setupInactivityAutoLock();
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         });
 
         async function hashStringSHA256(str) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(str);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            try {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(str);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (e) {
+                return str;
+            }
         }
 
         async function initPasscodeHash() {
@@ -556,18 +563,20 @@
             const queryCode = urlParams.get('code');
 
             if (queryWord) {
-                const found = vocabulary.find(v => v.hanzi.includes(queryWord) || v.pinyin.toLowerCase().includes(queryWord.toLowerCase()));
+                // ค้นหาคำศัพท์แบบตรงกันเป๊ะ หรือรวมอยู่ในฮันซี
+                const found = vocabulary.find(v => v.hanzi === queryWord || v.hanzi.includes(queryWord) || v.pinyin.toLowerCase() === queryWord.toLowerCase());
                 if (found) {
                     selectWord(found);
                 } else {
+                    // หากไม่เจอในฐานข้อมูล ให้ดึงข้อมูลตัวแรกในระบบมาแสดงแทน หรือสร้าง object พื้นฐานที่ถูกต้องตามตัวอักษรที่พิมพ์
                     selectWord({
-                        id: 'custom',
+                        id: 'custom_' + Date.now(),
                         hanzi: queryWord,
-                        pinyin: 'Custom',
-                        english: 'Scanned Character',
-                        code: 'QR-SCAN',
+                        pinyin: 'pinyin',
+                        english: 'Custom Word',
+                        code: 'WS-CUSTOM',
                         category: 'General',
-                        radical: '字',
+                        radical: queryWord.charAt(0),
                         strokes: queryWord.length * 5
                     });
                 }
@@ -607,8 +616,10 @@
         }
 
         function showStudentEmptyState() {
-            document.getElementById('studentEmptyState').classList.remove('hidden');
-            document.getElementById('studentActiveContent').classList.add('hidden');
+            const emptyEl = document.getElementById('studentEmptyState');
+            const contentEl = document.getElementById('studentActiveContent');
+            if (emptyEl) emptyEl.classList.remove('hidden');
+            if (contentEl) contentEl.classList.add('hidden');
         }
 
         function resetToHomeView() {
@@ -620,74 +631,89 @@
             activeWordObj = wordObj;
             currentCharIndex = 0;
 
-            document.getElementById('studentEmptyState').classList.add('hidden');
-            document.getElementById('studentActiveContent').classList.remove('hidden');
+            const emptyEl = document.getElementById('studentEmptyState');
+            const contentEl = document.getElementById('studentActiveContent');
+            if (emptyEl) emptyEl.classList.add('hidden');
+            if (contentEl) contentEl.classList.remove('hidden');
 
-            document.getElementById('activeWorksheetCode').textContent = wordObj.code;
-            document.getElementById('activeCategory').textContent = `${wordObj.category}`;
+            const codeEl = document.getElementById('activeWorksheetCode');
+            const catEl = document.getElementById('activeCategory');
+            if (codeEl) codeEl.textContent = wordObj.code;
+            if (catEl) catEl.textContent = `${wordObj.category}`;
 
             const chars = Array.from(wordObj.hanzi);
             const tabsContainer = document.getElementById('wordCharTabs');
-            tabsContainer.innerHTML = '';
+            if (tabsContainer) {
+                tabsContainer.innerHTML = '';
 
-            chars.forEach((char, idx) => {
-                const btn = document.createElement('button');
-                btn.className = `px-3.5 py-1.5 rounded-2xl font-kaiti font-bold text-xl border-2 transition ${
-                    idx === 0 
-                    ? 'bg-kawaii-pink text-white border-kawaii-dark shadow-sm' 
-                    : 'bg-kawaii-pinkLight/50 text-kawaii-dark border-transparent hover:border-kawaii-pink'
-                }`;
-                btn.textContent = char;
-                btn.onclick = () => selectCharTab(idx);
-                tabsContainer.appendChild(btn);
-            });
+                chars.forEach((char, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `px-3.5 py-1.5 rounded-2xl font-kaiti font-bold text-xl border-2 transition ${
+                        idx === 0 
+                        ? 'bg-kawaii-pink text-white border-kawaii-dark shadow-sm' 
+                        : 'bg-kawaii-pinkLight/50 text-kawaii-dark border-transparent hover:border-kawaii-pink'
+                    }`;
+                    btn.textContent = char;
+                    btn.onclick = () => selectCharTab(idx);
+                    tabsContainer.appendChild(btn);
+                });
+            }
 
             loadCharDetails(chars[0]);
-            
-            // Re-initialize trace canvas after visibility change to ensure correct bounding client rect
-            setTimeout(initTraceCanvas, 50);
+            setTimeout(initTraceCanvas, 100);
         }
 
         function selectCharTab(idx) {
             currentCharIndex = idx;
             const chars = Array.from(activeWordObj.hanzi);
             
-            const buttons = document.getElementById('wordCharTabs').children;
-            Array.from(buttons).forEach((btn, i) => {
-                if (i === idx) {
-                    btn.className = "px-3.5 py-1.5 rounded-2xl font-kaiti font-bold text-xl border-2 bg-kawaii-pink text-white border-kawaii-dark shadow-sm";
-                } else {
-                    btn.className = "px-3.5 py-1.5 rounded-2xl font-kaiti font-bold text-xl border-2 bg-kawaii-pinkLight/50 text-kawaii-dark border-transparent hover:border-kawaii-pink";
-                }
-            });
+            const tabsContainer = document.getElementById('wordCharTabs');
+            if (tabsContainer) {
+                const buttons = tabsContainer.children;
+                Array.from(buttons).forEach((btn, i) => {
+                    if (i === idx) {
+                        btn.className = "px-3.5 py-1.5 rounded-2xl font-kaiti font-bold text-xl border-2 bg-kawaii-pink text-white border-kawaii-dark shadow-sm";
+                    } else {
+                        btn.className = "px-3.5 py-1.5 rounded-2xl font-kaiti font-bold text-xl border-2 bg-kawaii-pinkLight/50 text-kawaii-dark border-transparent hover:border-kawaii-pink";
+                    }
+                });
+            }
 
             loadCharDetails(chars[idx]);
         }
 
         function loadCharDetails(char) {
-            document.getElementById('pinyinDisplay').textContent = activeWordObj.pinyin;
-            document.getElementById('meaningDisplay').textContent = `(${activeWordObj.english})`;
-            document.getElementById('strokeCount').textContent = activeWordObj.strokes || '?';
-            document.getElementById('radicalDisplay').textContent = activeWordObj.radical || '字';
+            const pinyinEl = document.getElementById('pinyinDisplay');
+            const meaningEl = document.getElementById('meaningDisplay');
+            const strokeEl = document.getElementById('strokeCount');
+            const radicalEl = document.getElementById('radicalDisplay');
+
+            if (pinyinEl) pinyinEl.textContent = activeWordObj.pinyin;
+            if (meaningEl) meaningEl.textContent = `(${activeWordObj.english})`;
+            if (strokeEl) strokeEl.textContent = activeWordObj.strokes || '?';
+            if (radicalEl) radicalEl.textContent = activeWordObj.radical || '字';
 
             const target = document.getElementById('hanziWriterTarget');
-            target.innerHTML = '';
-
-            try {
-                writerInstance = HanziWriter.create('hanziWriterTarget', char, {
-                    width: 220,
-                    height: 220,
-                    padding: 15,
-                    showOutline: true,
-                    strokeColor: '#3D3434',
-                    outlineColor: '#FFD3B6',
-                    drawingWidth: 20,
-                    strokeAnimationSpeed: isSlowSpeed ? 0.6 : 1.2,
-                    delayBetweenStrokes: isSlowSpeed ? 300 : 150
-                });
-                writerInstance.animateCharacter();
-            } catch (e) {
-                console.warn("HanziWriter Error:", e);
+            if (target) {
+                target.innerHTML = '';
+                try {
+                    if (typeof HanziWriter !== 'undefined') {
+                        writerInstance = HanziWriter.create('hanziWriterTarget', char, {
+                            width: 220,
+                            height: 220,
+                            padding: 15,
+                            showOutline: true,
+                            strokeColor: '#3D3434',
+                            outlineColor: '#FFD3B6',
+                            drawingWidth: 20,
+                            strokeAnimationSpeed: isSlowSpeed ? 0.6 : 1.2,
+                            delayBetweenStrokes: isSlowSpeed ? 300 : 150
+                        });
+                        writerInstance.animateCharacter();
+                    }
+                } catch (e) {
+                    console.warn("HanziWriter Error:", e);
+                }
             }
         }
 
@@ -696,6 +722,7 @@
         }
 
         function playAudio() {
+            if (!activeWordObj) return;
             const char = Array.from(activeWordObj.hanzi)[currentCharIndex] || activeWordObj.hanzi;
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -705,7 +732,9 @@
                 window.speechSynthesis.speak(utterance);
             }
 
-            confetti({ particleCount: 20, spread: 40, origin: { y: 0.8 } });
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 20, spread: 40, origin: { y: 0.8 } });
+            }
         }
 
         function toggleSpeed() {
@@ -715,13 +744,13 @@
             const label = document.getElementById('speedLabel');
 
             if (isSlowSpeed) {
-                icon.textContent = '🐢';
-                label.textContent = 'Slow 0.6x';
-                btn.classList.add('bg-kawaii-yellow');
+                if (icon) icon.textContent = '🐢';
+                if (label) label.textContent = 'Slow 0.6x';
+                if (btn) btn.classList.add('bg-kawaii-yellow');
             } else {
-                icon.textContent = '🐰';
-                label.textContent = 'Normal 1.0x';
-                btn.classList.remove('bg-kawaii-yellow');
+                if (icon) icon.textContent = '🐰';
+                if (label) label.textContent = 'Normal 1.0x';
+                if (btn) btn.classList.remove('bg-kawaii-yellow');
             }
 
             if (activeWordObj) {
@@ -730,16 +759,14 @@
             }
         }
 
-        // Fixed Tracing Canvas Logic with robust scale-aware coordinate calculation
         function initTraceCanvas() {
             traceCanvas = document.getElementById('traceCanvas');
             if (!traceCanvas) return;
             traceCtx = traceCanvas.getContext('2d');
 
-            // Set actual internal canvas dimensions to match CSS rendered size for crisp drawing
             const rect = traceCanvas.getBoundingClientRect();
-            traceCanvas.width = rect.width || 260;
-            traceCanvas.height = rect.height || 260;
+            traceCanvas.width = rect.width > 0 ? rect.width : 260;
+            traceCanvas.height = rect.height > 0 ? rect.height : 260;
 
             traceCtx.strokeStyle = '#FF6B81';
             traceCtx.lineWidth = 10;
@@ -748,7 +775,7 @@
 
             let isDrawing = false;
 
-            const getEventPos = (e) => {
+            const getPos = (e) => {
                 const r = traceCanvas.getBoundingClientRect();
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -758,26 +785,25 @@
                 };
             };
 
-            const startDraw = (e) => {
+            const start = (e) => {
                 isDrawing = true;
-                const pos = getEventPos(e);
+                const pos = getPos(e);
                 traceCtx.beginPath();
                 traceCtx.moveTo(pos.x, pos.y);
             };
 
-            const drawMove = (e) => {
+            const move = (e) => {
                 if (!isDrawing) return;
-                const pos = getEventPos(e);
+                const pos = getPos(e);
                 traceCtx.lineTo(pos.x, pos.y);
                 traceCtx.stroke();
             };
 
-            const stopDraw = () => {
+            const end = () => {
                 isDrawing = false;
                 traceCtx.beginPath();
             };
 
-            // Remove existing listeners to prevent duplication
             traceCanvas.onmousedown = null;
             traceCanvas.onmousemove = null;
             traceCanvas.onmouseup = null;
@@ -786,20 +812,14 @@
             traceCanvas.ontouchmove = null;
             traceCanvas.ontouchend = null;
 
-            traceCanvas.addEventListener('mousedown', startDraw);
-            traceCanvas.addEventListener('mousemove', drawMove);
-            traceCanvas.addEventListener('mouseup', stopDraw);
-            traceCanvas.addEventListener('mouseleave', stopDraw);
+            traceCanvas.addEventListener('mousedown', start);
+            traceCanvas.addEventListener('mousemove', move);
+            traceCanvas.addEventListener('mouseup', end);
+            traceCanvas.addEventListener('mouseleave', end);
 
-            traceCanvas.addEventListener('touchstart', (e) => {
-                startDraw(e);
-            }, { passive: true });
-            
-            traceCanvas.addEventListener('touchmove', (e) => {
-                drawMove(e);
-            }, { passive: true });
-            
-            traceCanvas.addEventListener('touchend', stopDraw);
+            traceCanvas.addEventListener('touchstart', start, { passive: true });
+            traceCanvas.addEventListener('touchmove', move, { passive: true });
+            traceCanvas.addEventListener('touchend', end);
         }
 
         function clearTraceCanvas() {
@@ -819,18 +839,24 @@
         }
 
         function openAuthModal() {
-            document.getElementById('pinInput').value = '';
-            document.getElementById('pinErrorMsg').classList.add('hidden');
-            document.getElementById('authModal').classList.remove('hidden');
+            const pinInput = document.getElementById('pinInput');
+            const err = document.getElementById('pinErrorMsg');
+            const modal = document.getElementById('authModal');
+            if (pinInput) pinInput.value = '';
+            if (err) err.classList.add('hidden');
+            if (modal) modal.classList.remove('hidden');
         }
 
         function closeAuthModal() {
-            document.getElementById('authModal').classList.add('hidden');
+            const modal = document.getElementById('authModal');
+            if (modal) modal.classList.add('hidden');
         }
 
         async function verifyAdminPin(e) {
             e.preventDefault();
-            const inputPin = document.getElementById('pinInput').value.trim();
+            const pinInput = document.getElementById('pinInput');
+            if (!pinInput) return;
+            const inputPin = pinInput.value.trim();
             const inputHash = await hashStringSHA256(inputPin);
             const savedHash = localStorage.getItem(PASSCODE_STORAGE_KEY);
 
@@ -840,15 +866,20 @@
                 switchToAdminView();
                 resetInactivityTimer();
             } else {
-                document.getElementById('pinErrorMsg').classList.remove('hidden');
+                const err = document.getElementById('pinErrorMsg');
+                if (err) err.classList.remove('hidden');
             }
         }
 
         async function handleChangePasscode(e) {
             e.preventDefault();
-            const currentPass = document.getElementById('currentPasscodeInput').value.trim();
-            const newPass = document.getElementById('newPasscodeInput').value.trim();
+            const currInput = document.getElementById('currentPasscodeInput');
+            const newInput = document.getElementById('newPasscodeInput');
             const msgEl = document.getElementById('passcodeFeedbackMsg');
+            if (!currInput || !newInput || !msgEl) return;
+
+            const currentPass = currInput.value.trim();
+            const newPass = newInput.value.trim();
 
             const currentHash = await hashStringSHA256(currentPass);
             const savedHash = localStorage.getItem(PASSCODE_STORAGE_KEY);
@@ -871,8 +902,8 @@
             msgEl.textContent = '✅ Passcode updated successfully with SHA-256 encryption!';
             msgEl.className = 'text-xs font-bold text-green-600 block';
 
-            document.getElementById('currentPasscodeInput').value = '';
-            document.getElementById('newPasscodeInput').value = '';
+            currInput.value = '';
+            newInput.value = '';
         }
 
         function setupInactivityAutoLock() {
@@ -895,30 +926,48 @@
         }
 
         function switchToAdminView() {
-            document.getElementById('studentViewSection').classList.add('hidden');
-            document.getElementById('adminViewSection').classList.remove('hidden');
+            isAdminLoggedIn = true;
+            const studentSec = document.getElementById('studentViewSection');
+            const adminSec = document.getElementById('adminViewSection');
+            const roleBadge = document.getElementById('roleBadge');
+            const adminBtnText = document.getElementById('adminBtnText');
+            const adminBtnIcon = document.getElementById('adminBtnIcon');
+
+            if (studentSec) studentSec.classList.add('hidden');
+            if (adminSec) adminSec.classList.remove('hidden');
             
-            document.getElementById('roleBadge').className = "text-[10px] bg-kawaii-purple text-kawaii-dark px-2 py-0.5 rounded-full border border-kawaii-dark font-kaiti font-bold";
-            document.getElementById('roleBadge').innerHTML = "👩‍🏫 Teacher / 教师端";
+            if (roleBadge) {
+                roleBadge.className = "text-[10px] bg-kawaii-purple text-kawaii-dark px-2 py-0.5 rounded-full border border-kawaii-dark font-kaiti font-bold";
+                roleBadge.innerHTML = "👩‍🏫 Teacher / 教师端";
+            }
             
-            document.getElementById('adminBtnText').textContent = "Logout";
-            document.getElementById('adminBtnIcon').setAttribute('data-lucide', 'log-out');
-            lucide.createIcons();
+            if (adminBtnText) adminBtnText.textContent = "Logout";
+            if (adminBtnIcon) adminBtnIcon.setAttribute('data-lucide', 'log-out');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            
             renderAdminTable();
         }
 
         function switchToStudentView() {
             isAdminLoggedIn = false;
             clearTimeout(inactivityTimer);
-            document.getElementById('adminViewSection').classList.add('hidden');
-            document.getElementById('studentViewSection').classList.remove('hidden');
+            const studentSec = document.getElementById('studentViewSection');
+            const adminSec = document.getElementById('adminViewSection');
+            const roleBadge = document.getElementById('roleBadge');
+            const adminBtnText = document.getElementById('adminBtnText');
+            const adminBtnIcon = document.getElementById('adminBtnIcon');
 
-            document.getElementById('roleBadge').className = "text-[10px] bg-kawaii-yellow text-kawaii-dark px-2 py-0.5 rounded-full border border-kawaii-dark font-kaiti font-bold";
-            document.getElementById('roleBadge').innerHTML = "🎓 Student / 学生端";
+            if (adminSec) adminSec.classList.add('hidden');
+            if (studentSec) studentSec.classList.remove('hidden');
 
-            document.getElementById('adminBtnText').textContent = "Teacher / 教师端";
-            document.getElementById('adminBtnIcon').setAttribute('data-lucide', 'lock');
-            lucide.createIcons();
+            if (roleBadge) {
+                roleBadge.className = "text-[10px] bg-kawaii-yellow text-kawaii-dark px-2 py-0.5 rounded-full border border-kawaii-dark font-kaiti font-bold";
+                roleBadge.innerHTML = "🎓 Student / 学生端";
+            }
+
+            if (adminBtnText) adminBtnText.textContent = "Teacher / 教师端";
+            if (adminBtnIcon) adminBtnIcon.setAttribute('data-lucide', 'lock');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function handleAddNewWord(e) {
@@ -947,7 +996,8 @@
             saveVocabularyStore();
             renderAdminTable();
 
-            document.getElementById('addWordForm').reset();
+            const form = document.getElementById('addWordForm');
+            if (form) form.reset();
             alert(`✅ Added new word: "${hanzi}" (${pinyin})`);
         }
 
@@ -994,7 +1044,7 @@
 
                 setTimeout(() => {
                     const qrBox = document.getElementById(`tableQr_${item.id}`);
-                    if (qrBox) {
+                    if (qrBox && typeof QRCode !== 'undefined') {
                         qrBox.innerHTML = '';
                         new QRCode(qrBox, {
                             text: targetUrl,
@@ -1008,7 +1058,7 @@
                 }, 50);
             });
 
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function openQrModal(id) {
@@ -1022,24 +1072,27 @@
             document.getElementById('cardEnglish').textContent = `(${item.english})`;
 
             const qrContainer = document.getElementById('modalQrCodeContainer');
-            qrContainer.innerHTML = '';
+            if (qrContainer && typeof QRCode !== 'undefined') {
+                qrContainer.innerHTML = '';
+                const targetUrl = window.location.origin + window.location.pathname + '?word=' + encodeURIComponent(item.hanzi);
 
-            const targetUrl = window.location.origin + window.location.pathname + '?word=' + encodeURIComponent(item.hanzi);
+                new QRCode(qrContainer, {
+                    text: targetUrl,
+                    width: 130,
+                    height: 130,
+                    colorDark : "#3D3434",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
 
-            new QRCode(qrContainer, {
-                text: targetUrl,
-                width: 130,
-                height: 130,
-                colorDark : "#3D3434",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
-
-            document.getElementById('qrCardModal').classList.remove('hidden');
+            const modal = document.getElementById('qrCardModal');
+            if (modal) modal.classList.remove('hidden');
         }
 
         function closeQrModal() {
-            document.getElementById('qrCardModal').classList.add('hidden');
+            const modal = document.getElementById('qrCardModal');
+            if (modal) modal.classList.add('hidden');
         }
 
         function downloadQrCardPng() {
@@ -1102,6 +1155,7 @@
 
         function batchPrintAllQrs() {
             const printArea = document.getElementById('printableQrArea');
+            if (!printArea) return;
             printArea.innerHTML = '';
 
             vocabulary.forEach(item => {
@@ -1120,14 +1174,17 @@
                 printArea.appendChild(card);
 
                 setTimeout(() => {
-                    new QRCode(document.getElementById(qrId), {
-                        text: targetUrl,
-                        width: 90,
-                        height: 90,
-                        colorDark : "#000000",
-                        colorLight : "#ffffff",
-                        correctLevel : QRCode.CorrectLevel.M
-                    });
+                    const box = document.getElementById(qrId);
+                    if (box && typeof QRCode !== 'undefined') {
+                        new QRCode(box, {
+                            text: targetUrl,
+                            width: 90,
+                            height: 90,
+                            colorDark : "#000000",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.M
+                        });
+                    }
                 }, 50);
             });
 
@@ -1138,14 +1195,25 @@
             }, 500);
         }
 
-        function openScanModal() { document.getElementById('scanModal').classList.remove('hidden'); }
-        function closeScanModal() { document.getElementById('scanModal').classList.add('hidden'); }
+        function openScanModal() {
+            const modal = document.getElementById('scanModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeScanModal() {
+            const modal = document.getElementById('scanModal');
+            if (modal) modal.classList.add('hidden');
+        }
 
         function submitSearchWord() {
-            const query = document.getElementById('manualInput').value.trim().toLowerCase();
+            const inputEl = document.getElementById('manualInput');
+            if (!inputEl) return;
+            const query = inputEl.value.trim().toLowerCase();
             if (!query) return;
 
+            // ค้นหาในฐานข้อมูลอย่างละเอียด ทั้งตัวจีน พinyin และรหัส worksheet
             const match = vocabulary.find(v => 
+                v.hanzi.toLowerCase() === query || 
                 v.hanzi.toLowerCase().includes(query) || 
                 v.code.toLowerCase() === query || 
                 v.pinyin.toLowerCase().includes(query)
@@ -1157,13 +1225,13 @@
                 switchToStudentView();
             } else {
                 selectWord({
-                    id: 'search_custom',
-                    hanzi: document.getElementById('manualInput').value.trim(),
-                    pinyin: 'Search',
+                    id: 'search_custom_' + Date.now(),
+                    hanzi: inputEl.value.trim(),
+                    pinyin: 'pinyin',
                     english: 'Searched Term',
                     code: 'SEARCH',
                     category: 'General',
-                    radical: '字',
+                    radical: inputEl.value.trim().charAt(0),
                     strokes: 8
                 });
                 closeScanModal();
