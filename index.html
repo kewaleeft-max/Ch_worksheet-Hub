@@ -305,11 +305,6 @@
                         <label class="block text-xs font-bold text-kawaii-dark mb-1">Radical / 部首</label>
                         <input type="text" id="addRadical" placeholder="e.g. 艹" class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-kaiti text-sm">
                     </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-kawaii-dark mb-1">Stroke Count / 笔画数</label>
-                        <input type="number" id="addStrokes" placeholder="e.g. 12" class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-sm">
-                    </div>
                 </div>
 
                 <button type="submit" class="w-full bg-kawaii-mint hover:bg-kawaii-mintDark text-kawaii-dark font-extrabold py-3 rounded-2xl border-2 border-kawaii-dark shadow-kawaii-sm transition flex items-center justify-center space-x-2 text-sm mt-2">
@@ -466,26 +461,16 @@
     <!-- JS APP LOGIC -->
     <script>
         const DEFAULT_VOCABULARY = [
-            { id: '1', hanzi: '你好', pinyin: 'nǐ hǎo', english: 'Hello', code: 'WS-101', category: 'Greetings', radical: '亻', strokes: 7 },
-            { id: '2', hanzi: '猫', pinyin: 'māo', english: 'Cat', code: 'WS-102', category: 'Animals', radical: '犭', strokes: 11 },
-            { id: '3', hanzi: '狗', pinyin: 'gǒu', english: 'Dog', code: 'WS-102', category: 'Animals', radical: '犭', strokes: 8 },
-            { id: '4', hanzi: '水', pinyin: 'shuǐ', english: 'Water', code: 'WS-103', category: 'Nature', radical: '水', strokes: 4 },
-            { id: '5', hanzi: '谢谢', pinyin: 'xiè xie', english: 'Thank you', code: 'WS-101', category: 'Greetings', radical: '讠', strokes: 12 },
-            { id: '6', hanzi: '爱', pinyin: 'ài', english: 'Love', code: 'WS-104', category: 'General', radical: '爪', strokes: 10 },
-            { id: '7', hanzi: '太阳', pinyin: 'tài yáng', english: 'Sun', code: 'WS-105', category: 'Nature', radical: '日', strokes: 8 },
-            { id: '8', hanzi: '苹果', pinyin: 'píng guǒ', english: 'Apple', code: 'WS-106', category: 'Food', radical: '艹', strokes: 8 },
-            { id: '9', hanzi: '葡萄', pinyin: 'pú tao', english: 'Grapes', code: 'WS-107', category: 'Food', radical: '艹', strokes: 22 }
+            { id: '1', hanzi: '你好', pinyin: 'nǐ hǎo', english: 'Hello', code: 'WS-101', category: 'Greetings', radical: '亻' },
+            { id: '2', hanzi: '猫', pinyin: 'māo', english: 'Cat', code: 'WS-102', category: 'Animals', radical: '犭' },
+            { id: '3', hanzi: '狗', pinyin: 'gǒu', english: 'Dog', code: 'WS-102', category: 'Animals', radical: '犭' },
+            { id: '4', hanzi: '水', pinyin: 'shuǐ', english: 'Water', code: 'WS-103', category: 'Nature', radical: '水' },
+            { id: '5', hanzi: '谢谢', pinyin: 'xiè xie', english: 'Thank you', code: 'WS-101', category: 'Greetings', radical: '讠' },
+            { id: '6', hanzi: '爱', pinyin: 'ài', english: 'Love', code: 'WS-104', category: 'General', radical: '爪' },
+            { id: '7', hanzi: '太阳', pinyin: 'tài yáng', english: 'Sun', code: 'WS-105', category: 'Nature', radical: '日' },
+            { id: '8', hanzi: '苹果', pinyin: 'píng guǒ', english: 'Apple', code: 'WS-106', category: 'Food', radical: '艹' },
+            { id: '9', hanzi: '葡萄', pinyin: 'pú tao', english: 'Grapes', code: 'WS-107', category: 'Food', radical: '艹' }
         ];
-
-        // กำหนดจำนวนขีดที่ถูกต้องแยกตามตัวอักษรจีนรายตัว (เพื่อให้เวลาสลับแท็บแสดงผลถูกต้องเป๊ะๆ)
-        const CHARACTER_STROKES_MAP = {
-            '你': 7, '好': 6, '猫': 11, '狗': 8, '水': 4, '谢': 12, '爱': 10, 
-            '太': 4, '阳': 6, '苹': 8, '果': 8, '葡': 12, '萄': 10
-        };
-
-        function getStrokesForChar(char) {
-            return CHARACTER_STROKES_MAP[char] || 8;
-        }
 
         let vocabulary = [];
         let activeWordObj = null;
@@ -499,6 +484,7 @@
         let traceCtx = null;
 
         const PASSCODE_STORAGE_KEY = 'baobao_admin_passcode_sha256';
+        const STORAGE_VERSION_KEY = 'baobao_vocab_version_v4_auto';
 
         document.addEventListener('DOMContentLoaded', async () => {
             await initPasscodeHash();
@@ -543,12 +529,11 @@
                     selectWord({
                         id: 'custom_' + Date.now(),
                         hanzi: decodedWord,
-                        pinyin: decodedWord === '葡萄' ? 'pú tao' : 'pinyin',
-                        english: decodedWord === '葡萄' ? 'Grapes' : 'Custom Word',
-                        code: 'WS-107',
-                        category: 'Food',
-                        radical: decodedWord.charAt(0),
-                        strokes: Array.from(decodedWord).reduce((sum, c) => sum + getStrokesForChar(c), 0)
+                        pinyin: 'pinyin',
+                        english: 'Custom Word',
+                        code: 'WS-CUSTOM',
+                        category: 'General',
+                        radical: decodedWord.charAt(0)
                     });
                 }
             } else if (queryCode) {
@@ -560,32 +545,25 @@
         }
 
         function loadVocabularyStore() {
-            const stored = localStorage.getItem('baobao_chinese_vocab_v3');
-            if (stored) {
+            const versionCheck = localStorage.getItem(STORAGE_VERSION_KEY);
+            const stored = localStorage.getItem('baobao_chinese_vocab_v4');
+            
+            if (!versionCheck || !stored) {
+                vocabulary = DEFAULT_VOCABULARY;
+                localStorage.setItem('baobao_chinese_vocab_v4', JSON.stringify(vocabulary));
+                localStorage.setItem(STORAGE_VERSION_KEY, 'true');
+            } else {
                 try {
-                    let parsed = JSON.parse(stored);
-                    parsed = parsed.map(v => {
-                        if (v.hanzi === '葡萄') {
-                            return { ...v, pinyin: 'pú tao', english: 'Grapes', strokes: 22 };
-                        }
-                        return v;
-                    });
-                    if (!parsed.some(v => v.hanzi === '葡萄')) {
-                        parsed.push({ id: '9', hanzi: '葡萄', pinyin: 'pú tao', english: 'Grapes', code: 'WS-107', category: 'Food', radical: '艹', strokes: 22 });
-                    }
-                    vocabulary = parsed;
+                    vocabulary = JSON.parse(stored);
                 } catch (e) {
                     vocabulary = DEFAULT_VOCABULARY;
                 }
-            } else {
-                vocabulary = DEFAULT_VOCABULARY;
-                saveVocabularyStore();
             }
             renderAdminTable();
         }
 
         function saveVocabularyStore() {
-            localStorage.setItem('baobao_chinese_vocab_v3', JSON.stringify(vocabulary));
+            localStorage.setItem('baobao_chinese_vocab_v4', JSON.stringify(vocabulary));
         }
 
         function resetDefaultVocabulary() {
@@ -671,10 +649,6 @@
 
             if (pinyinEl) pinyinEl.textContent = activeWordObj.pinyin;
             if (meaningEl) meaningEl.textContent = `(${activeWordObj.english})`;
-            
-            // ดึงจำนวนขีดเฉพาะตัวอักษรที่กำลังแสดงอยู่
-            const specificStrokes = getStrokesForChar(char);
-            if (strokeEl) strokeEl.textContent = specificStrokes;
             if (radicalEl) radicalEl.textContent = activeWordObj.radical || '字';
 
             const target = document.getElementById('hanziWriterTarget');
@@ -692,6 +666,10 @@
                             drawingWidth: 20,
                             strokeAnimationSpeed: isSlowSpeed ? 0.6 : 1.2,
                             delayBetweenStrokes: isSlowSpeed ? 300 : 150
+                        }, function(err, writer) {
+                            if (!err && writer && writer.strokes) {
+                                if (strokeEl) strokeEl.textContent = writer.strokes.length;
+                            }
                         });
                         writerInstance.animateCharacter();
                     }
@@ -961,8 +939,7 @@
             const english = document.getElementById('addEnglish').value.trim();
             const code = document.getElementById('addCode').value.trim();
             const category = document.getElementById('addCategory').value;
-            const radical = document.getElementById('addRadical').value.trim() || '字';
-            const strokes = parseInt(document.getElementById('addStrokes').value) || Array.from(hanzi).reduce((sum, c) => sum + getStrokesForChar(c), 0);
+            const radical = document.getElementById('addRadical').value.trim() || hanzi.charAt(0);
 
             const newObj = {
                 id: Date.now().toString(),
@@ -971,8 +948,7 @@
                 english,
                 code,
                 category,
-                radical,
-                strokes
+                radical
             };
 
             vocabulary.unshift(newObj);
@@ -1171,7 +1147,7 @@
                 }, 50);
             });
 
-            printArea.classList.remove('hidden');
+            printArea.classList.add('hidden');
             setTimeout(() => {
                 window.print();
                 printArea.classList.add('hidden');
@@ -1214,8 +1190,7 @@
                     english: 'Searched Term',
                     code: 'SEARCH',
                     category: 'General',
-                    radical: customHanzi.charAt(0),
-                    strokes: Array.from(customHanzi).reduce((sum, c) => sum + getStrokesForChar(c), 0)
+                    radical: customHanzi.charAt(0)
                 });
                 closeScanModal();
                 switchToStudentView();
