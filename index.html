@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Worksheet Audio Hub & Encrypted Admin Portal | 中文练习册音频与二维码中心 🐼✨</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Hanzi Writer Library CDN for authentic stroke order animations -->
+    <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+    <!-- QRCodeJS Library CDN for dynamic QR Code generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Google Fonts: Fredoka, Noto Sans SC, Zhi Mang Xing, Ma Shan Zheng -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kawaii: {
+                            pink: '#FF9EAA',
+                            pinkLight: '#FFF0F3',
+                            pinkDark: '#FF6B81',
+                            yellow: '#FFF3BF',
+                            yellowDark: '#FFD43B',
+                            mint: '#C1F0C1',
+                            mintDark: '#38D9A9',
+                            sky: '#A5D8FF',
+                            skyDark: '#339AF0',
+                            purple: '#EEB2EE',
+                            cream: '#FFFDF9',
+                            dark: '#3D3434',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Fredoka', 'sans-serif'],
+                        // Strict KaiTi Font Fallback Stack
+                        kaiti: ['KaiTi', '楷体', 'STKaiti', 'KaiTi_GB2312', '"AR PL UKai CN"', '"Noto Serif SC"', '"Ma Shan Zheng"', 'serif'],
+                    },
+                    boxShadow: {
+                        'kawaii': '0 8px 0px 0px rgba(255, 158, 170, 0.4)',
+                        'kawaii-sm': '0 4px 0px 0px rgba(255, 158, 170, 0.3)',
+                        'kawaii-yellow': '0 8px 0px 0px rgba(255, 212, 59, 0.5)',
+                        'kawaii-mint': '0 8px 0px 0px rgba(56, 217, 169, 0.4)',
+                        'kawaii-purple': '0 8px 0px 0px rgba(238, 178, 238, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* KaiTi Custom Font Definition */
+        @font-face {
+            font-family: 'KaiTi';
+            src: local('KaiTi'), local('楷体'), local('STKaiti'), local('KaiTi_GB2312'),
+                 url('https://fonts.gstatic.com/s/mashanzheng/v12/VuJ3dN3I14pM-m34421R3-3_8N6.woff2') format('woff2');
+            font-display: swap;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #FFF0F3; }
+        ::-webkit-scrollbar-thumb { background: #FF9EAA; border-radius: 999px; }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        @keyframes bobbing {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-5px) scale(1.02); }
+        }
+
+        .animate-float { animation: floatSlow 3.5s ease-in-out infinite; }
+        .animate-bob { animation: bobbing 2s ease-in-out infinite; }
+
+        /* Rice Grid Canvas Background (米字格) */
+        .mizige-bg {
+            background-color: #ffffff;
+            background-image: 
+                linear-gradient(to right, rgba(255, 158, 170, 0.25) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 158, 170, 0.25) 1px, transparent 1px),
+                linear-gradient(45deg, rgba(255, 158, 170, 0.15) 1px, transparent 1px),
+                linear-gradient(-45deg, rgba(255, 158, 170, 0.15) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            background-position: center;
+        }
+
+        /* Strict KaiTi Class Utility */
+        .font-kaiti {
+            font-family: 'KaiTi', '楷体', 'STKaiti', 'KaiTi_GB2312', 'AR PL UKai CN', 'Noto Serif SC', 'Ma Shan Zheng', serif !important;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printableQrArea, #printableQrArea * { visibility: visible; }
+            #printableQrArea { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-kawaii-cream font-sans text-kawaii-dark min-h-screen flex flex-col selection:bg-kawaii-pink selection:text-white relative overflow-x-hidden pb-12">
+
+    <!-- Floating Background Icons -->
+    <div class="fixed top-4 left-3 opacity-60 pointer-events-none z-0 animate-float">
+        <span class="text-3xl sm:text-5xl">☁️</span>
+    </div>
+    <div class="fixed top-12 right-4 opacity-60 pointer-events-none z-0 animate-float" style="animation-delay: 1s;">
+        <span class="text-3xl sm:text-5xl">🌸</span>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b-4 border-kawaii-pink/30 px-4 py-3 shadow-sm">
+        <div class="max-w-md md:max-w-4xl mx-auto flex items-center justify-between">
+            <!-- Brand Logo & Title -->
+            <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchToStudentView()">
+                <div class="w-10 h-10 rounded-2xl bg-kawaii-pink flex items-center justify-center text-white text-xl shadow-kawaii-sm border-2 border-kawaii-dark animate-bob">
+                    🐼
+                </div>
+                <div>
+                    <h1 class="font-bold text-base text-kawaii-dark leading-tight flex items-center gap-1.5">
+                        Bao Bao QR Hub 
+                        <span id="roleBadge" class="text-[10px] bg-kawaii-yellow text-kawaii-dark px-2 py-0.5 rounded-full border border-kawaii-dark font-kaiti font-bold">
+                            🎓 Student / 学生端
+                        </span>
+                    </h1>
+                    <p class="text-[11px] text-kawaii-pinkDark font-semibold font-kaiti">Stroke Order & Audio / 笔顺与发音中心</p>
+                </div>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="flex items-center space-x-2">
+                <!-- Search Button -->
+                <button onclick="openScanModal()" class="flex items-center space-x-1 bg-kawaii-yellow hover:bg-kawaii-yellowDark text-kawaii-dark border-2 border-kawaii-dark px-2.5 py-1.5 rounded-2xl text-xs font-bold shadow-kawaii-sm active:translate-y-0.5 transition">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Search / 查找</span>
+                </button>
+
+                <!-- Admin Access Button -->
+                <button id="adminToggleBtn" onclick="handleAdminAuthToggle()" class="flex items-center space-x-1.5 bg-kawaii-purple hover:bg-purple-300 text-kawaii-dark border-2 border-kawaii-dark px-3 py-1.5 rounded-2xl text-xs font-bold shadow-kawaii-sm active:translate-y-0.5 transition">
+                    <i id="adminBtnIcon" data-lucide="lock" class="w-4 h-4"></i>
+                    <span id="adminBtnText">Teacher / 教师端</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== VIEW 1: STUDENT MODE (学生端) ==================== -->
+    <main id="studentViewSection" class="max-w-md mx-auto px-4 py-4 flex-1 w-full space-y-5 z-10 transition-all">
+
+        <!-- Active Worksheet & Character Tabs -->
+        <div class="bg-white border-3 border-kawaii-dark rounded-3xl p-4 shadow-kawaii relative overflow-hidden">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2">
+                    <span id="activeWorksheetCode" class="bg-kawaii-pink text-white text-xs font-bold font-mono px-2.5 py-0.5 rounded-full border border-kawaii-dark">
+                        WS-101
+                    </span>
+                    <span id="activeCategory" class="bg-kawaii-yellow text-kawaii-dark text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-kawaii-dark">
+                        Greetings / 问候语
+                    </span>
+                </div>
+                <span class="text-xs text-kawaii-pinkDark font-bold flex items-center gap-1">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> QR Ready / 扫码就绪
+                </span>
+            </div>
+
+            <!-- Dynamic Character Selector Tabs -->
+            <div class="flex items-center justify-between border-t-2 border-kawaii-pink/20 pt-3">
+                <div id="wordCharTabs" class="flex items-center space-x-2 overflow-x-auto py-1 scrollbar-none w-full">
+                    <!-- Dynamic Character Tabs render here in KaiTi font -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Stroke Order & Pronunciation Main Box -->
+        <div class="bg-white border-3 border-kawaii-dark rounded-3xl p-5 shadow-kawaii flex flex-col items-center relative">
+            
+            <!-- Metadata Box (Pinyin, English, Radical, Strokes) -->
+            <div class="w-full flex items-center justify-between bg-kawaii-pinkLight/60 rounded-2xl p-3 border-2 border-kawaii-pink/40 mb-4">
+                <div>
+                    <div class="flex items-baseline space-x-2 flex-wrap">
+                        <span id="pinyinDisplay" class="text-2xl font-bold text-kawaii-pinkDark font-mono">nǐ</span>
+                        <span id="meaningDisplay" class="text-xs font-bold text-gray-600">(You)</span>
+                    </div>
+                    <div class="flex items-center space-x-3 text-[11px] text-gray-500 font-bold mt-1">
+                        <span>Strokes / 笔画: <strong id="strokeCount" class="text-kawaii-dark">7</strong></span>
+                        <span>Radical / 部首: <strong id="radicalDisplay" class="text-kawaii-dark font-kaiti font-bold">亻</strong></span>
+                    </div>
+                </div>
+
+                <!-- Pronunciation Button -->
+                <button onclick="playAudio()" class="bg-kawaii-pink hover:bg-kawaii-pinkDark active:scale-95 text-white p-3.5 rounded-2xl border-2 border-kawaii-dark shadow-kawaii-sm transition flex flex-col items-center justify-center shrink-0">
+                    <i data-lucide="volume-2" class="w-6 h-6"></i>
+                    <span class="text-[10px] font-bold font-kaiti mt-0.5">听发音</span>
+                </button>
+            </div>
+
+            <!-- Interactive Stroke Canvas Box (Mi Zi Ge / 米字格) -->
+            <div class="relative w-full aspect-square max-w-[260px] mizige-bg border-4 border-kawaii-dark rounded-3xl overflow-hidden shadow-inner flex items-center justify-center my-1">
+                <div id="hanziWriterTarget" class="w-full h-full flex items-center justify-center cursor-pointer" onclick="animateStrokes()">
+                    <!-- HanziWriter renders SVG stroke animation here -->
+                </div>
+                <button onclick="animateStrokes()" class="absolute bottom-2 right-2 bg-kawaii-yellow hover:bg-kawaii-yellowDark text-kawaii-dark text-[10px] font-bold px-2.5 py-1 rounded-xl border border-kawaii-dark shadow-sm flex items-center space-x-1">
+                    <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+                    <span>Replay / 重播</span>
+                </button>
+            </div>
+
+            <!-- Speed & Animation Controls -->
+            <div class="w-full grid grid-cols-2 gap-2 mt-4">
+                <button onclick="animateStrokes()" class="bg-kawaii-mint hover:bg-kawaii-mintDark text-kawaii-dark font-bold py-2.5 px-3 rounded-2xl border-2 border-kawaii-dark shadow-kawaii-sm active:translate-y-0.5 transition text-xs flex items-center justify-center space-x-1.5">
+                    <i data-lucide="play-circle" class="w-4 h-4"></i>
+                    <span>Stroke Order / 看笔顺</span>
+                </button>
+
+                <button id="speedToggleBtn" onclick="toggleSpeed()" class="bg-white hover:bg-kawaii-yellow text-kawaii-dark font-bold py-2.5 px-3 rounded-2xl border-2 border-kawaii-dark transition text-xs flex items-center justify-center space-x-1.5">
+                    <span id="speedIcon" class="text-sm">🐰</span>
+                    <span id="speedLabel">Normal 1.0x</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tracing Pad Canvas (米字格 描红) -->
+        <div class="bg-white border-3 border-kawaii-dark rounded-3xl p-4 shadow-kawaii">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-1.5">
+                    <span class="text-lg">✏️</span>
+                    <h3 class="font-bold text-sm text-kawaii-dark">Tracing Practice Pad / 描红写字板</h3>
+                </div>
+                <button onclick="clearTraceCanvas()" class="text-xs bg-gray-100 hover:bg-gray-200 text-kawaii-dark font-bold px-2.5 py-1 rounded-xl border border-gray-300">
+                    Clear / 清除
+                </button>
+            </div>
+
+            <!-- Touch Drawing Canvas -->
+            <div class="relative w-full aspect-square max-w-[260px] mx-auto mizige-bg border-3 border-kawaii-dark rounded-2xl overflow-hidden touch-none">
+                <canvas id="traceCanvas" class="w-full h-full cursor-crosshair"></canvas>
+            </div>
+            <p class="text-[11px] text-center text-gray-400 font-medium mt-2">Practice writing with finger or mouse ✍️</p>
+        </div>
+
+        <!-- Student Vocabulary List Cards -->
+        <div class="bg-white border-3 border-kawaii-dark rounded-3xl p-4 shadow-kawaii">
+            <div class="flex items-center justify-between mb-3">
+                <h4 class="font-extrabold text-xs text-kawaii-dark flex items-center gap-1">
+                    <span>📑 Worksheet Vocabulary / 练习册词汇库</span>
+                </h4>
+                <span id="totalWordCountBadge" class="text-[10px] bg-kawaii-pinkLight text-kawaii-pinkDark font-bold px-2 py-0.5 rounded-full border border-kawaii-pink">
+                    0 Words
+                </span>
+            </div>
+
+            <div id="studentWordGrid" class="grid grid-cols-2 gap-2">
+                <!-- Dynamically generated vocabulary buttons render here in KaiTi font -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== VIEW 2: ADMIN / TEACHER MODE (教师管理端) ==================== -->
+    <main id="adminViewSection" class="max-w-md md:max-w-4xl mx-auto px-4 py-4 flex-1 w-full space-y-6 z-10 hidden">
+        
+        <!-- Admin Dashboard Header -->
+        <div class="bg-kawaii-purple/30 border-3 border-kawaii-dark rounded-3xl p-5 shadow-kawaii flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-white text-kawaii-dark border-2 border-kawaii-dark rounded-2xl flex items-center justify-center text-2xl shadow-kawaii-sm">
+                    👩‍🏫
+                </div>
+                <div>
+                    <h2 class="text-lg font-extrabold text-kawaii-dark">Teacher Dashboard / 教师管理后台</h2>
+                    <p class="text-xs text-gray-600 font-semibold">Protected with SHA-256 Web Crypto API Encryption</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="batchPrintAllQrs()" class="bg-kawaii-yellow hover:bg-kawaii-yellowDark text-kawaii-dark border-2 border-kawaii-dark px-3 py-1.5 rounded-2xl text-xs font-bold shadow-kawaii-sm flex items-center space-x-1">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                    <span>Print All QRs / 批量打印</span>
+                </button>
+                <button onclick="switchToStudentView()" class="bg-white hover:bg-gray-100 text-kawaii-dark border-2 border-kawaii-dark px-3 py-1.5 rounded-2xl text-xs font-bold shadow-kawaii-sm flex items-center space-x-1">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    <span>Logout / 退出系统</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Add New Word Form -->
+        <div class="bg-white border-3 border-kawaii-dark rounded-3xl p-5 shadow-kawaii">
+            <h3 class="text-base font-extrabold text-kawaii-dark mb-4 flex items-center gap-2">
+                <span class="w-7 h-7 bg-kawaii-pink text-white rounded-xl border border-kawaii-dark flex items-center justify-center text-xs">➕</span>
+                <span>Add New Word / 添加新词汇</span>
+            </h3>
+
+            <form id="addWordForm" onsubmit="handleAddNewWord(event)" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-kawaii-dark mb-1">Chinese Hanzi / 汉字 <span class="text-red-500">*</span></label>
+                        <input type="text" id="addHanzi" placeholder="e.g. 太阳 or 狗" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-kaiti text-xl font-bold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-kawaii-dark mb-1">Pinyin / 拼音 <span class="text-red-500">*</span></label>
+                        <input type="text" id="addPinyin" placeholder="e.g. tài yáng" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-mono text-sm font-bold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-kawaii-dark mb-1">English Meaning / 英文含义 <span class="text-red-500">*</span></label>
+                        <input type="text" id="addEnglish" placeholder="e.g. Sun" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-sm font-semibold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-kawaii-dark mb-1">Worksheet Code / 练习册编号 <span class="text-red-500">*</span></label>
+                        <input type="text" id="addCode" placeholder="e.g. WS-105" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-mono text-sm font-bold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-kawaii-dark mb-1">Category / 类别</label>
+                        <select id="addCategory" class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-sm font-bold bg-white">
+                            <option value="Greetings">Greetings / 问候语</option>
+                            <option value="Animals">Animals / 动物</option>
+                            <option value="Nature">Nature / 自然</option>
+                            <option value="School">School / 校园</option>
+                            <option value="Family">Family / 家庭</option>
+                            <option value="General">General / 常规</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-kawaii-dark mb-1">Radical / 部首</label>
+                        <input type="text" id="addRadical" placeholder="e.g. 日" class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-kaiti text-sm">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-kawaii-dark mb-1">Stroke Count / 笔画数</label>
+                        <input type="number" id="addStrokes" placeholder="e.g. 8" class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-sm">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-kawaii-mint hover:bg-kawaii-mintDark text-kawaii-dark font-extrabold py-3 rounded-2xl border-2 border-kawaii-dark shadow-kawaii-sm transition flex items-center justify-center space-x-2 text-sm mt-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    <span>Save Vocabulary / 保存新词汇</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Security & Security Settings Card (Passcode Change) -->
+        <div class="bg-white border-3 border-kawaii-dark rounded-3xl p-5 shadow-kawaii">
+            <h3 class="text-base font-extrabold text-kawaii-dark mb-3 flex items-center gap-2">
+                <span class="w-7 h-7 bg-kawaii-purple text-kawaii-dark rounded-xl border border-kawaii-dark flex items-center justify-center text-xs">🔐</span>
+                <span>Security Settings (SHA-256 Passcode) / 安全设置</span>
+            </h3>
+
+            <form onsubmit="handleChangePasscode(event)" class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-kawaii-dark mb-1">Current Passcode / 当前密码</label>
+                        <input type="password" id="currentPasscodeInput" placeholder="Enter current PIN" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-purple outline-none font-bold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-kawaii-dark mb-1">New Passcode / 新密码</label>
+                        <input type="password" id="newPasscodeInput" placeholder="Enter new PIN" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-purple outline-none font-bold text-sm">
+                    </div>
+                </div>
+                <div id="passcodeFeedbackMsg" class="text-xs font-bold hidden"></div>
+                <button type="submit" class="bg-kawaii-purple hover:bg-purple-300 text-kawaii-dark font-extrabold px-4 py-2 rounded-2xl border-2 border-kawaii-dark shadow-kawaii-sm transition text-xs flex items-center space-x-1.5">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    <span>Update Encrypted Passcode / 更新密码</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Vocabulary Manager & QR Export Table -->
+        <div class="bg-white border-3 border-kawaii-dark rounded-3xl p-5 shadow-kawaii">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <h3 class="text-base font-extrabold text-kawaii-dark flex items-center gap-2">
+                    <span class="w-7 h-7 bg-kawaii-yellow text-kawaii-dark rounded-xl border border-kawaii-dark flex items-center justify-center text-xs">📋</span>
+                    <span>Vocabulary & QR Manager / 词汇与二维码管理</span>
+                </h3>
+                <button onclick="resetDefaultVocabulary()" class="text-[11px] bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-2.5 py-1 rounded-xl border border-gray-300">
+                    Reset Defaults / 重置默认
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-kawaii-pinkLight border-b-2 border-kawaii-dark text-kawaii-dark">
+                            <th class="p-2.5 font-extrabold">Code / 编号</th>
+                            <th class="p-2.5 font-extrabold">Hanzi / 汉字</th>
+                            <th class="p-2.5 font-extrabold">Pinyin / 拼音</th>
+                            <th class="p-2.5 font-extrabold">Meaning / 含义</th>
+                            <th class="p-2.5 font-extrabold text-center">QR Preview / 二维码</th>
+                            <th class="p-2.5 font-extrabold text-right">Actions / 操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminVocabularyTableBody" class="divide-y divide-gray-200 font-medium">
+                        <!-- Admin Vocabulary List Rows render here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Printable Area for Batch QR Sheet -->
+    <div id="printableQrArea" class="hidden p-8 grid grid-cols-2 sm:grid-cols-3 gap-6 bg-white"></div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Teacher Auth PIN Modal (Encrypted Verification) -->
+    <div id="authModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-5 border-4 border-kawaii-dark shadow-kawaii relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="text-center mb-4">
+                <div class="w-14 h-14 bg-kawaii-purple text-kawaii-dark rounded-2xl border-2 border-kawaii-dark flex items-center justify-center text-2xl mx-auto mb-2 shadow-kawaii-sm">
+                    🔐
+                </div>
+                <h3 class="text-lg font-extrabold text-kawaii-dark">Encrypted Admin Login</h3>
+                <p class="text-xs text-gray-500 font-medium mt-0.5">SHA-256 Web Crypto Authentication</p>
+                <p class="text-[11px] text-kawaii-pinkDark font-bold mt-1">(Default Passcode: <code class="bg-yellow-100 px-1 py-0.5 rounded border font-mono">1234</code>)</p>
+            </div>
+
+            <form onsubmit="verifyAdminPin(event)" class="space-y-3">
+                <div>
+                    <input type="password" id="pinInput" placeholder="Enter Passcode (1234)" required class="w-full px-4 py-2.5 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-purple outline-none text-center font-bold text-xl tracking-widest">
+                </div>
+                <div id="pinErrorMsg" class="text-xs text-red-500 font-bold text-center hidden">
+                    ❌ Invalid Passcode! (Default is 1234)
+                </div>
+                <button type="submit" class="w-full bg-kawaii-purple hover:bg-purple-300 text-kawaii-dark font-bold py-2.5 rounded-2xl border-2 border-kawaii-dark shadow-kawaii-sm transition flex items-center justify-center space-x-2">
+                    <i data-lucide="key" class="w-4 h-4"></i>
+                    <span>Authenticate & Access / 验证登录</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- QR Code Download Preview Modal -->
+    <div id="qrCardModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-5 border-4 border-kawaii-dark shadow-kawaii relative text-center">
+            <button onclick="closeQrModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="mb-3">
+                <span class="text-2xl">🏷️</span>
+                <h3 class="text-base font-extrabold text-kawaii-dark">Download QR Printable Card</h3>
+                <p class="text-xs text-gray-500">Scan to listen & view stroke order</p>
+            </div>
+
+            <!-- Printable Card Canvas Preview -->
+            <div id="qrCardBox" class="bg-kawaii-cream border-3 border-kawaii-dark rounded-2xl p-4 shadow-sm relative overflow-hidden flex flex-col items-center my-3">
+                <span id="cardWorksheetCode" class="bg-kawaii-pink text-white font-mono font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-kawaii-dark mb-2">
+                    WS-101
+                </span>
+                <h2 id="cardHanzi" class="font-kaiti text-5xl font-bold text-kawaii-dark mb-0.5">你好</h2>
+                <p id="cardPinyin" class="font-mono text-sm font-bold text-kawaii-pinkDark mb-0.5">nǐ hǎo</p>
+                <p id="cardEnglish" class="text-xs font-bold text-gray-600 mb-3">(Hello)</p>
+
+                <div id="modalQrCodeContainer" class="bg-white p-2.5 rounded-xl border-2 border-kawaii-dark shadow-sm flex items-center justify-center">
+                    <!-- QRCodeJS canvas/img -->
+                </div>
+                <p class="text-[10px] text-gray-400 font-medium mt-2">Bao Bao Chinese Worksheet Audio Hub 🐼</p>
+            </div>
+
+            <div class="space-y-2 mt-4">
+                <button onclick="downloadQrCardPng()" class="w-full bg-kawaii-mint hover:bg-kawaii-mintDark text-kawaii-dark font-extrabold py-2.5 rounded-2xl border-2 border-kawaii-dark shadow-kawaii-sm transition flex items-center justify-center space-x-2 text-xs">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Download PNG Card / 下载卡片</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Search Modal -->
+    <div id="scanModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-5 border-4 border-kawaii-dark shadow-kawaii relative">
+            <button onclick="closeScanModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div class="text-center mb-4">
+                <div class="w-14 h-14 bg-kawaii-yellow text-kawaii-dark rounded-2xl border-2 border-kawaii-dark flex items-center justify-center text-2xl mx-auto mb-2 shadow-kawaii-sm">
+                    📷
+                </div>
+                <h3 class="text-lg font-extrabold text-kawaii-dark">Search Word / 查找词汇</h3>
+                <p class="text-xs text-gray-500 font-medium mt-0.5">Enter Character, Pinyin, or Worksheet Code</p>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <input type="text" id="manualInput" placeholder="e.g. 猫, shuǐ, WS-101" class="w-full px-4 py-2.5 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-base font-kaiti font-bold text-center">
+                </div>
+                <button onclick="submitSearchWord()" class="w-full bg-kawaii-pink hover:bg-kawaii-pinkDark text-white font-bold py-2.5 rounded-2xl border-2 border-kawaii-dark shadow-kawaii-sm transition flex items-center justify-center space-x-2">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    <span>Find & View / 搜索词汇</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS APP LOGIC -->
+    <script>
+        // Default Chinese Vocabulary
+        const DEFAULT_VOCABULARY = [
+            { id: '1', hanzi: '你好', pinyin: 'nǐ hǎo', english: 'Hello', code: 'WS-101', category: 'Greetings', radical: '亻', strokes: 7 },
+            { id: '2', hanzi: '猫', pinyin: 'māo', english: 'Cat', code: 'WS-102', category: 'Animals', radical: '犭', strokes: 11 },
+            { id: '3', hanzi: '狗', pinyin: 'gǒu', english: 'Dog', code: 'WS-102', category: 'Animals', radical: '犭', strokes: 8 },
+            { id: '4', hanzi: '水', pinyin: 'shuǐ', english: 'Water', code: 'WS-103', category: 'Nature', radical: '水', strokes: 4 },
+            { id: '5', hanzi: '谢谢', pinyin: 'xiè xie', english: 'Thank you', code: 'WS-101', category: 'Greetings', radical: '讠', strokes: 12 },
+            { id: '6', hanzi: '爱', pinyin: 'ài', english: 'Love', code: 'WS-104', category: 'General', radical: '爪', strokes: 10 },
+            { id: '7', hanzi: '太阳', pinyin: 'tài yáng', english: 'Sun', code: 'WS-105', category: 'Nature', radical: '日', strokes: 8 },
+            { id: '8', hanzi: '苹果', pinyin: 'píng guǒ', english: 'Apple', code: 'WS-106', category: 'General', radical: '艹', strokes: 8 }
+        ];
+
+        // State Variables
+        let vocabulary = [];
+        let activeWordObj = null;
+        let activeQrTargetObj = null;
+        let currentCharIndex = 0;
+        let writerInstance = null;
+        let isSlowSpeed = false;
+        let isAdminLoggedIn = false;
+        let inactivityTimer = null;
+        let traceCanvas, traceCtx, isDrawing = false;
+
+        // Default Passcode Hash Key in LocalStorage
+        const PASSCODE_STORAGE_KEY = 'baobao_admin_passcode_sha256';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initPasscodeHash();
+            loadVocabularyStore();
+            checkUrlQueryParams();
+            initTraceCanvas();
+            setupInactivityAutoLock();
+            lucide.createIcons();
+        });
+
+        // Web Crypto API SHA-256 Hashing Function
+        async function hashStringSHA256(str) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Initialize Passcode Hash (Default '1234')
+        async function initPasscodeHash() {
+            if (!localStorage.getItem(PASSCODE_STORAGE_KEY)) {
+                const defaultHash = await hashStringSHA256('1234');
+                localStorage.setItem(PASSCODE_STORAGE_KEY, defaultHash);
+            }
+        }
+
+        // Check QR Query Params
+        function checkUrlQueryParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryWord = urlParams.get('word');
+            const queryCode = urlParams.get('code');
+
+            if (queryWord) {
+                const found = vocabulary.find(v => v.hanzi.includes(queryWord) || v.pinyin.toLowerCase().includes(queryWord.toLowerCase()));
+                if (found) selectWord(found);
+            } else if (queryCode) {
+                const found = vocabulary.find(v => v.code.toLowerCase() === queryCode.toLowerCase());
+                if (found) selectWord(found);
+            }
+        }
+
+        // LocalStorage Vocabulary Persistence
+        function loadVocabularyStore() {
+            const stored = localStorage.getItem('baobao_chinese_vocab_v3');
+            if (stored) {
+                try {
+                    vocabulary = JSON.parse(stored);
+                } catch (e) {
+                    vocabulary = DEFAULT_VOCABULARY;
+                }
+            } else {
+                vocabulary = DEFAULT_VOCABULARY;
+                saveVocabularyStore();
+            }
+
+            if (vocabulary.length > 0) {
+                selectWord(vocabulary[0]);
+            }
+            renderStudentWordGrid();
+            renderAdminTable();
+        }
+
+        function saveVocabularyStore() {
+            localStorage.setItem('baobao_chinese_vocab_v3', JSON.stringify(vocabulary));
+        }
+
+        function resetDefaultVocabulary() {
+            if (confirm("Reset vocabulary back to default list? / 恢复默认词汇列表？")) {
+                vocabulary = [...DEFAULT_VOCABULARY];
+                saveVocabularyStore();
+                renderStudentWordGrid();
+                renderAdminTable();
+                if (vocabulary.length > 0) selectWord(vocabulary[0]);
+            }
+        }
+
+        // Select Active Word in Student View
+        function selectWord(wordObj) {
+            activeWordObj = wordObj;
+            currentCharIndex = 0;
+
+            document.getElementById('activeWorksheetCode').textContent = wordObj.code;
+            document.getElementById('activeCategory').textContent = `${wordObj.category}`;
+
+            const chars = Array.from(wordObj.hanzi);
+            const tabsContainer = document.getElementById('wordCharTabs');
+            tabsContainer.innerHTML = '';
+
+            chars.forEach((char, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `px-3.5 py-1.5 rounded-2xl font-kaiti font-bold text-xl border-2 transition ${
+                    idx === 0 
+                    ? 'bg-kawaii-pink text-white border-kawaii-dark shadow-sm' 
+                    : 'bg-kawaii-pinkLight/50 text-kawaii-dark border-transparent hover:border-kawaii-pink'
+                }`;
+                btn.textContent = char;
+                btn.onclick = () => selectCharTab(idx);
+                tabsContainer.appendChild(btn);
+            });
+
+            loadCharDetails(chars[0]);
+        }
+
+        function selectCharTab(idx) {
+            currentCharIndex = idx;
+            const chars = Array.from(activeWordObj.hanzi);
+            
+            const buttons = document.getElementById('wordCharTabs').children;
+            Array.from(buttons).forEach((btn, i) => {
+                if (i === idx) {
+                    btn.className = "px-3.5 py-1.5 rounded-2xl font-kaiti font-bold text-xl border-2 bg-kawaii-pink text-white border-kawaii-dark shadow-sm";
+                } else {
+                    btn.className = "px-3.5 py-1.5 rounded-2xl font-kaiti font-bold text-xl border-2 bg-kawaii-pinkLight/50 text-kawaii-dark border-transparent hover:border-kawaii-pink";
+                }
+            });
+
+            loadCharDetails(chars[idx]);
+        }
+
+        // Render Stroke Animation & Char Details
+        function loadCharDetails(char) {
+            document.getElementById('pinyinDisplay').textContent = activeWordObj.pinyin;
+            document.getElementById('meaningDisplay').textContent = `(${activeWordObj.english})`;
+            document.getElementById('strokeCount').textContent = activeWordObj.strokes || '?';
+            document.getElementById('radicalDisplay').textContent = activeWordObj.radical || '字';
+
+            const target = document.getElementById('hanziWriterTarget');
+            target.innerHTML = '';
+
+            try {
+                writerInstance = HanziWriter.create('hanziWriterTarget', char, {
+                    width: 220,
+                    height: 220,
+                    padding: 15,
+                    showOutline: true,
+                    strokeColor: '#3D3434',
+                    outlineColor: '#FFD3B6',
+                    drawingWidth: 20,
+                    strokeAnimationSpeed: isSlowSpeed ? 0.6 : 1.2,
+                    delayBetweenStrokes: isSlowSpeed ? 300 : 150
+                });
+                writerInstance.animateCharacter();
+            } catch (e) {
+                console.warn("HanziWriter Error:", e);
+            }
+        }
+
+        function animateStrokes() {
+            if (writerInstance) writerInstance.animateCharacter();
+        }
+
+        // Web Speech API Pronunciation
+        function playAudio() {
+            const char = Array.from(activeWordObj.hanzi)[currentCharIndex] || activeWordObj.hanzi;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(char);
+                utterance.lang = 'zh-CN';
+                utterance.rate = isSlowSpeed ? 0.6 : 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+
+            confetti({ particleCount: 20, spread: 40, origin: { y: 0.8 } });
+        }
+
+        function toggleSpeed() {
+            isSlowSpeed = !isSlowSpeed;
+            const btn = document.getElementById('speedToggleBtn');
+            const icon = document.getElementById('speedIcon');
+            const label = document.getElementById('speedLabel');
+
+            if (isSlowSpeed) {
+                icon.textContent = '🐢';
+                label.textContent = 'Slow 0.6x';
+                btn.classList.add('bg-kawaii-yellow');
+            } else {
+                icon.textContent = '🐰';
+                label.textContent = 'Normal 1.0x';
+                btn.classList.remove('bg-kawaii-yellow');
+            }
+
+            if (activeWordObj) {
+                const char = Array.from(activeWordObj.hanzi)[currentCharIndex];
+                loadCharDetails(char);
+            }
+        }
+
+        // Render Student Word Cards Grid
+        function renderStudentWordGrid() {
+            const grid = document.getElementById('studentWordGrid');
+            const badge = document.getElementById('totalWordCountBadge');
+            badge.textContent = `${vocabulary.length} Words`;
+            grid.innerHTML = '';
+
+            vocabulary.forEach(item => {
+                const card = document.createElement('button');
+                card.onclick = () => {
+                    selectWord(item);
+                    clearTraceCanvas();
+                };
+                card.className = "bg-kawaii-pinkLight/50 hover:bg-kawaii-pink hover:text-white border-2 border-kawaii-dark p-2.5 rounded-2xl text-center transition flex flex-col items-center justify-center shadow-sm";
+                card.innerHTML = `
+                    <span class="font-kaiti font-bold text-2xl leading-tight">${item.hanzi}</span>
+                    <span class="text-[11px] font-mono font-bold text-kawaii-pinkDark block">${item.pinyin}</span>
+                    <span class="text-[10px] bg-white text-kawaii-dark font-mono px-1.5 py-0.2 rounded border border-kawaii-dark mt-1">${item.code}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Tracing Canvas Logic (米字格)
+        function initTraceCanvas() {
+            traceCanvas = document.getElementById('traceCanvas');
+            traceCtx = traceCanvas.getContext('2d');
+
+            const container = traceCanvas.parentElement;
+            traceCanvas.width = container.clientWidth;
+            traceCanvas.height = container.clientHeight;
+
+            traceCtx.strokeStyle = '#FF6B81';
+            traceCtx.lineWidth = 12;
+            traceCtx.lineCap = 'round';
+            traceCtx.lineJoin = 'round';
+
+            traceCanvas.addEventListener('mousedown', startDrawing);
+            traceCanvas.addEventListener('mousemove', draw);
+            traceCanvas.addEventListener('mouseup', stopDrawing);
+            traceCanvas.addEventListener('mouseleave', stopDrawing);
+
+            traceCanvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                startDrawing(e.touches[0]);
+            });
+            traceCanvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                draw(e.touches[0]);
+            });
+            traceCanvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = traceCanvas.getBoundingClientRect();
+            traceCtx.beginPath();
+            traceCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = traceCanvas.getBoundingClientRect();
+            traceCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            traceCtx.stroke();
+        }
+
+        function stopDrawing() { isDrawing = false; }
+        function clearTraceCanvas() { traceCtx.clearRect(0, 0, traceCanvas.width, traceCanvas.height); }
+
+        // ================= ENCRYPTED AUTH & ADMIN LOGIC =================
+
+        function handleAdminAuthToggle() {
+            if (isAdminLoggedIn) {
+                switchToStudentView();
+            } else {
+                openAuthModal();
+            }
+        }
+
+        function openAuthModal() {
+            document.getElementById('pinInput').value = '';
+            document.getElementById('pinErrorMsg').classList.add('hidden');
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        // Verify Passcode using SHA-256 Web Crypto API
+        async function verifyAdminPin(e) {
+            e.preventDefault();
+            const inputPin = document.getElementById('pinInput').value.trim();
+            const inputHash = await hashStringSHA256(inputPin);
+            const savedHash = localStorage.getItem(PASSCODE_STORAGE_KEY);
+
+            if (inputHash === savedHash) {
+                isAdminLoggedIn = true;
+                closeAuthModal();
+                switchToAdminView();
+                resetInactivityTimer();
+            } else {
+                document.getElementById('pinErrorMsg').classList.remove('hidden');
+            }
+        }
+
+        // Change Encrypted Admin Passcode
+        async function handleChangePasscode(e) {
+            e.preventDefault();
+            const currentPass = document.getElementById('currentPasscodeInput').value.trim();
+            const newPass = document.getElementById('newPasscodeInput').value.trim();
+            const msgEl = document.getElementById('passcodeFeedbackMsg');
+
+            const currentHash = await hashStringSHA256(currentPass);
+            const savedHash = localStorage.getItem(PASSCODE_STORAGE_KEY);
+
+            if (currentHash !== savedHash) {
+                msgEl.textContent = '❌ Current passcode is incorrect!';
+                msgEl.className = 'text-xs font-bold text-red-500 block';
+                return;
+            }
+
+            if (newPass.length < 4) {
+                msgEl.textContent = '⚠️ Passcode must be at least 4 characters!';
+                msgEl.className = 'text-xs font-bold text-yellow-600 block';
+                return;
+            }
+
+            const newHash = await hashStringSHA256(newPass);
+            localStorage.setItem(PASSCODE_STORAGE_KEY, newHash);
+
+            msgEl.textContent = '✅ Passcode updated successfully with SHA-256 encryption!';
+            msgEl.className = 'text-xs font-bold text-green-600 block';
+
+            document.getElementById('currentPasscodeInput').value = '';
+            document.getElementById('newPasscodeInput').value = '';
+        }
+
+        // Auto-lock Session Management (10 min Inactivity)
+        function setupInactivityAutoLock() {
+            const events = ['mousemove', 'keydown', 'click', 'touchstart'];
+            events.forEach(evt => {
+                window.addEventListener(evt, () => {
+                    if (isAdminLoggedIn) resetInactivityTimer();
+                });
+            });
+        }
+
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                if (isAdminLoggedIn) {
+                    switchToStudentView();
+                    alert("⏰ Admin session timed out due to inactivity.");
+                }
+            }, 10 * 60 * 1000); // 10 minutes
+        }
+
+        function switchToAdminView() {
+            document.getElementById('studentViewSection').classList.add('hidden');
+            document.getElementById('adminViewSection').classList.remove('hidden');
+            
+            document.getElementById('roleBadge').className = "text-[10px] bg-kawaii-purple text-kawaii-dark px-2 py-0.5 rounded-full border border-kawaii-dark font-kaiti font-bold";
+            document.getElementById('roleBadge').innerHTML = "👩‍🏫 Teacher / 教师端";
+            
+            document.getElementById('adminBtnText').textContent = "Logout";
+            document.getElementById('adminBtnIcon').setAttribute('data-lucide', 'log-out');
+            lucide.createIcons();
+            renderAdminTable();
+        }
+
+        function switchToStudentView() {
+            isAdminLoggedIn = false;
+            clearTimeout(inactivityTimer);
+            document.getElementById('adminViewSection').classList.add('hidden');
+            document.getElementById('studentViewSection').classList.remove('hidden');
+
+            document.getElementById('roleBadge').className = "text-[10px] bg-kawaii-yellow text-kawaii-dark px-2 py-0.5 rounded-full border border-kawaii-dark font-kaiti font-bold";
+            document.getElementById('roleBadge').innerHTML = "🎓 Student / 学生端";
+
+            document.getElementById('adminBtnText').textContent = "Teacher / 教师端";
+            document.getElementById('adminBtnIcon').setAttribute('data-lucide', 'lock');
+            lucide.createIcons();
+        }
+
+        function handleAddNewWord(e) {
+            e.preventDefault();
+
+            const hanzi = document.getElementById('addHanzi').value.trim();
+            const pinyin = document.getElementById('addPinyin').value.trim();
+            const english = document.getElementById('addEnglish').value.trim();
+            const code = document.getElementById('addCode').value.trim();
+            const category = document.getElementById('addCategory').value;
+            const radical = document.getElementById('addRadical').value.trim() || '字';
+            const strokes = parseInt(document.getElementById('addStrokes').value) || hanzi.length * 5;
+
+            const newObj = {
+                id: Date.now().toString(),
+                hanzi,
+                pinyin,
+                english,
+                code,
+                category,
+                radical,
+                strokes
+            };
+
+            vocabulary.unshift(newObj);
+            saveVocabularyStore();
+            renderStudentWordGrid();
+            renderAdminTable();
+
+            document.getElementById('addWordForm').reset();
+            alert(`✅ Added new word: "${hanzi}" (${pinyin})`);
+        }
+
+        function deleteWord(id) {
+            const target = vocabulary.find(item => item.id === id);
+            if (!target) return;
+
+            if (confirm(`Are you sure you want to delete "${target.hanzi}"? / 确定删除吗？`)) {
+                vocabulary = vocabulary.filter(item => item.id !== id);
+                saveVocabularyStore();
+                renderStudentWordGrid();
+                renderAdminTable();
+
+                if (activeWordObj && activeWordObj.id === id && vocabulary.length > 0) {
+                    selectWord(vocabulary[0]);
+                }
+            }
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminVocabularyTableBody');
+            tbody.innerHTML = '';
+
+            vocabulary.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-kawaii-pinkLight/30 transition";
+                
+                const targetUrl = window.location.origin + window.location.pathname + '?word=' + encodeURIComponent(item.hanzi);
+
+                tr.innerHTML = `
+                    <td class="p-2.5 font-mono font-bold text-kawaii-pinkDark">${item.code}</td>
+                    <td class="p-2.5 font-kaiti font-bold text-2xl">${item.hanzi}</td>
+                    <td class="p-2.5 font-mono">${item.pinyin}</td>
+                    <td class="p-2.5">${item.english}</td>
+                    <td class="p-2.5 text-center">
+                        <div id="tableQr_${item.id}" class="w-12 h-12 mx-auto bg-white border p-1 rounded-lg shadow-sm flex items-center justify-center"></div>
+                    </td>
+                    <td class="p-2.5 text-right space-x-1">
+                        <button onclick="openQrModal('${item.id}')" class="bg-kawaii-mint hover:bg-kawaii-mintDark text-kawaii-dark font-bold px-2 py-1 rounded-xl border border-kawaii-dark transition text-[11px] inline-flex items-center gap-1">
+                            <i data-lucide="qr-code" class="w-3 h-3"></i> QR
+                        </button>
+                        <button onclick="deleteWord('${item.id}')" class="bg-red-100 hover:bg-red-200 text-red-600 font-bold px-2 py-1 rounded-xl border border-red-300 transition text-[11px]">
+                            Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+
+                setTimeout(() => {
+                    const qrBox = document.getElementById(`tableQr_${item.id}`);
+                    if (qrBox) {
+                        qrBox.innerHTML = '';
+                        new QRCode(qrBox, {
+                            text: targetUrl,
+                            width: 40,
+                            height: 40,
+                            colorDark : "#3D3434",
+                            colorLight : "#ffffff",
+                            correctLevel : QRCode.CorrectLevel.M
+                        });
+                    }
+                }, 50);
+            });
+
+            lucide.createIcons();
+        }
+
+        // QR Code Preview Modal & Canvas Card Generator
+        function openQrModal(id) {
+            const item = vocabulary.find(v => v.id === id);
+            if (!item) return;
+
+            activeQrTargetObj = item;
+            document.getElementById('cardWorksheetCode').textContent = item.code;
+            document.getElementById('cardHanzi').textContent = item.hanzi;
+            document.getElementById('cardPinyin').textContent = item.pinyin;
+            document.getElementById('cardEnglish').textContent = `(${item.english})`;
+
+            const qrContainer = document.getElementById('modalQrCodeContainer');
+            qrContainer.innerHTML = '';
+
+            const targetUrl = window.location.origin + window.location.pathname + '?word=' + encodeURIComponent(item.hanzi);
+
+            new QRCode(qrContainer, {
+                text: targetUrl,
+                width: 130,
+                height: 130,
+                colorDark : "#3D3434",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('qrCardModal').classList.remove('hidden');
+        }
+
+        function closeQrModal() {
+            document.getElementById('qrCardModal').classList.add('hidden');
+        }
+
+        // Download High-Res PNG Flashcard with HTML5 Canvas KaiTi Rendering
+        function downloadQrCardPng() {
+            if (!activeQrTargetObj) return;
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 400;
+            canvas.height = 520;
+
+            // Background Card
+            ctx.fillStyle = '#FFFDF9';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Outer Border
+            ctx.strokeStyle = '#3D3434';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+            // Header Tag (Worksheet Code)
+            ctx.fillStyle = '#FF9EAA';
+            ctx.beginPath();
+            ctx.roundRect(140, 25, 120, 30, 15);
+            ctx.fill();
+            ctx.strokeStyle = '#3D3434';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(activeQrTargetObj.code, 200, 45);
+
+            // Chinese Hanzi Character in KaiTi
+            ctx.fillStyle = '#3D3434';
+            ctx.font = 'bold 68px "KaiTi", "楷体", "STKaiti", "KaiTi_GB2312", "Noto Serif SC", serif';
+            ctx.fillText(activeQrTargetObj.hanzi, 200, 128);
+
+            // Pinyin
+            ctx.fillStyle = '#FF6B81';
+            ctx.font = 'bold 22px monospace';
+            ctx.fillText(activeQrTargetObj.pinyin, 200, 165);
+
+            // English Meaning
+            ctx.fillStyle = '#666666';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText(`(${activeQrTargetObj.english})`, 200, 195);
+
+            // Render QR Code Image onto Canvas
+            const qrImg = document.querySelector('#modalQrCodeContainer img') || document.querySelector('#modalQrCodeContainer canvas');
+            if (qrImg) {
+                ctx.drawImage(qrImg, 125, 220, 150, 150);
+                ctx.strokeStyle = '#3D3434';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(120, 215, 160, 160);
+            }
+
+            // Footer branding
+            ctx.fillStyle = '#FF9EAA';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText('Bao Bao Chinese Audio Hub 🐼', 200, 420);
+
+            // Trigger Image Download
+            const link = document.createElement('a');
+            link.download = `KaiTi_QR_Card_${activeQrTargetObj.code}_${activeQrTargetObj.hanzi}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Batch QR Sheet Print
+        function batchPrintAllQrs() {
+            const printArea = document.getElementById('printableQrArea');
+            printArea.innerHTML = '';
+
+            vocabulary.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "border-2 border-black p-4 rounded-xl text-center bg-white flex flex-col items-center justify-center space-y-1";
+                const targetUrl = window.location.origin + window.location.pathname + '?word=' + encodeURIComponent(item.hanzi);
+                
+                const qrId = `batch_qr_${item.id}`;
+                card.innerHTML = `
+                    <span class="text-xs font-mono font-bold bg-pink-100 px-2 py-0.5 rounded border border-black">${item.code}</span>
+                    <h2 class="text-4xl font-bold font-kaiti">${item.hanzi}</h2>
+                    <p class="text-xs font-mono font-bold text-pink-600">${item.pinyin}</p>
+                    <p class="text-[10px] text-gray-600">(${item.english})</p>
+                    <div id="${qrId}" class="my-2 p-1 border rounded bg-white"></div>
+                `;
+                printArea.appendChild(card);
+
+                setTimeout(() => {
+                    new QRCode(document.getElementById(qrId), {
+                        text: targetUrl,
+                        width: 90,
+                        height: 90,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.M
+                    });
+                }, 50);
+            });
+
+            printArea.classList.remove('hidden');
+            setTimeout(() => {
+                window.print();
+                printArea.classList.add('hidden');
+            }, 500);
+        }
+
+        // Search Modal Functions
+        function openScanModal() { document.getElementById('scanModal').classList.remove('hidden'); }
+        function closeScanModal() { document.getElementById('scanModal').classList.add('hidden'); }
+
+        function submitSearchWord() {
+            const query = document.getElementById('manualInput').value.trim().toLowerCase();
+            if (!query) return;
+
+            const match = vocabulary.find(v => 
+                v.hanzi.includes(query) || 
+                v.code.toLowerCase() === query || 
+                v.pinyin.toLowerCase().includes(query)
+            );
+
+            if (match) {
+                selectWord(match);
+                closeScanModal();
+                switchToStudentView();
+            } else {
+                alert(`No vocabulary found matching "${query}".`);
+            }
+        }
+    </script>
+</body>
+</html>
