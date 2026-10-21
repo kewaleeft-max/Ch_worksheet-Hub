@@ -6,9 +6,9 @@
     <title>Chinese Worksheet Audio Hub & Encrypted Admin Portal | 中文练习册音频与二维码中心 🐼✨</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Hanzi Writer Library CDN for authentic stroke order animations -->
+    <!-- Hanzi Writer Library CDN -->
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
-    <!-- QRCodeJS Library CDN for dynamic QR Code generation -->
+    <!-- QRCodeJS Library CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -120,7 +120,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-base text-kawaii-dark leading-tight flex items-center gap-1.5">
-                        Bao Bao QR Hub 
+                        Chinese Worksheet
                         <span id="roleBadge" class="text-[10px] bg-kawaii-yellow text-kawaii-dark px-2 py-0.5 rounded-full border border-kawaii-dark font-kaiti font-bold">
                             🎓 Student / 学生端
                         </span>
@@ -216,7 +216,7 @@
                 <!-- Interactive Stroke Canvas Box -->
                 <div class="relative w-full aspect-square max-w-[260px] mizige-bg border-4 border-kawaii-dark rounded-3xl overflow-hidden shadow-inner flex items-center justify-center my-1">
                     <div id="hanziWriterTarget" class="w-full h-full flex items-center justify-center cursor-pointer" onclick="animateStrokes()">
-                        <!-- HanziWriter renders SVG stroke animation here -->
+                        <!-- HanziWriter SVG -->
                     </div>
                     <button onclick="animateStrokes()" class="absolute bottom-2 right-2 bg-kawaii-yellow hover:bg-kawaii-yellowDark text-kawaii-dark text-[10px] font-bold px-2.5 py-1 rounded-xl border border-kawaii-dark shadow-sm flex items-center space-x-1">
                         <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
@@ -238,7 +238,7 @@
                 </div>
             </div>
 
-            <!-- Tracing Pad Canvas (米字格 描红) -->
+            <!-- Tracing Pad Canvas -->
             <div class="bg-white border-3 border-kawaii-dark rounded-3xl p-4 shadow-kawaii">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center space-x-1.5">
@@ -250,7 +250,6 @@
                     </button>
                 </div>
 
-                <!-- Touch Drawing Canvas with touch-action none for stable drawing -->
                 <div class="relative w-full aspect-square max-w-[260px] mx-auto mizige-bg border-3 border-kawaii-dark rounded-2xl overflow-hidden" style="touch-action: none;">
                     <canvas id="traceCanvas" class="w-full h-full cursor-crosshair block"></canvas>
                 </div>
@@ -263,7 +262,6 @@
     <!-- ==================== VIEW 2: ADMIN / TEACHER MODE ==================== -->
     <main id="adminViewSection" class="max-w-md md:max-w-4xl mx-auto px-4 py-4 flex-1 w-full space-y-6 z-10 hidden">
         
-        <!-- Admin Dashboard Header -->
         <div class="bg-kawaii-purple/30 border-3 border-kawaii-dark rounded-3xl p-5 shadow-kawaii flex items-center justify-between flex-wrap gap-3">
             <div class="flex items-center space-x-3">
                 <div class="w-12 h-12 bg-white text-kawaii-dark border-2 border-kawaii-dark rounded-2xl flex items-center justify-center text-2xl shadow-kawaii-sm">
@@ -297,22 +295,22 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-kawaii-dark mb-1">Chinese Hanzi / 汉字 <span class="text-red-500">*</span></label>
-                        <input type="text" id="addHanzi" placeholder="e.g. 太阳 or 狗" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-kaiti text-xl font-bold">
+                        <input type="text" id="addHanzi" placeholder="e.g. 太阳 or 西瓜" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-kaiti text-xl font-bold">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-kawaii-dark mb-1">Pinyin / 拼音 <span class="text-red-500">*</span></label>
-                        <input type="text" id="addPinyin" placeholder="e.g. tài yáng" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-mono text-sm font-bold">
+                        <input type="text" id="addPinyin" placeholder="e.g. xī guā" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-mono text-sm font-bold">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-kawaii-dark mb-1">English Meaning / 英文含义 <span class="text-red-500">*</span></label>
-                        <input type="text" id="addEnglish" placeholder="e.g. Sun" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-sm font-semibold">
+                        <input type="text" id="addEnglish" placeholder="e.g. Watermelon" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-sm font-semibold">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-kawaii-dark mb-1">Worksheet Code / 练习册编号 <span class="text-red-500">*</span></label>
-                        <input type="text" id="addCode" placeholder="e.g. WS-105" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-mono text-sm font-bold">
+                        <input type="text" id="addCode" placeholder="e.g. WS-107" required class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-mono text-sm font-bold">
                     </div>
 
                     <div>
@@ -321,6 +319,7 @@
                             <option value="Greetings">Greetings / 问候语</option>
                             <option value="Animals">Animals / 动物</option>
                             <option value="Nature">Nature / 自然</option>
+                            <option value="Food">Food / 食物</option>
                             <option value="School">School / 校园</option>
                             <option value="Family">Family / 家庭</option>
                             <option value="General">General / 常规</option>
@@ -329,12 +328,12 @@
 
                     <div>
                         <label class="block text-xs font-bold text-kawaii-dark mb-1">Radical / 部首</label>
-                        <input type="text" id="addRadical" placeholder="e.g. 日" class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-kaiti text-sm">
+                        <input type="text" id="addRadical" placeholder="e.g. 西" class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none font-kaiti text-sm">
                     </div>
 
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-kawaii-dark mb-1">Stroke Count / 笔画数</label>
-                        <input type="number" id="addStrokes" placeholder="e.g. 8" class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-sm">
+                        <input type="number" id="addStrokes" placeholder="e.g. 6" class="w-full px-3.5 py-2 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-sm">
                     </div>
                 </div>
 
@@ -371,7 +370,7 @@
             </form>
         </div>
 
-        <!-- Vocabulary Manager & QR Export Table -->
+        <!-- Vocabulary Manager Table -->
         <div class="bg-white border-3 border-kawaii-dark rounded-3xl p-5 shadow-kawaii">
             <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <h3 class="text-base font-extrabold text-kawaii-dark flex items-center gap-2">
@@ -404,12 +403,10 @@
 
     </main>
 
-    <!-- Printable Area for Batch QR Sheet -->
+    <!-- Printable Area -->
     <div id="printableQrArea" class="hidden p-8 grid grid-cols-2 sm:grid-cols-3 gap-6 bg-white"></div>
 
-    <!-- ==================== MODALS ==================== -->
-
-    <!-- Teacher Auth PIN Modal -->
+    <!-- Modals -->
     <div id="authModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-3xl p-5 border-4 border-kawaii-dark shadow-kawaii relative">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1">
@@ -439,7 +436,7 @@
         </div>
     </div>
 
-    <!-- QR Code Download Preview Modal -->
+    <!-- QR Card Modal -->
     <div id="qrCardModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-3xl p-5 border-4 border-kawaii-dark shadow-kawaii relative text-center">
             <button onclick="closeQrModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1">
@@ -452,7 +449,6 @@
                 <p class="text-xs text-gray-500">Scan to listen & view stroke order</p>
             </div>
 
-            <!-- Printable Card Canvas Preview -->
             <div id="qrCardBox" class="bg-kawaii-cream border-3 border-kawaii-dark rounded-2xl p-4 shadow-sm relative overflow-hidden flex flex-col items-center my-3">
                 <span id="cardWorksheetCode" class="bg-kawaii-pink text-white font-mono font-bold text-[11px] px-2.5 py-0.5 rounded-full border border-kawaii-dark mb-2">
                     WS-101
@@ -461,10 +457,8 @@
                 <p id="cardPinyin" class="font-mono text-sm font-bold text-kawaii-pinkDark mb-0.5">nǐ hǎo</p>
                 <p id="cardEnglish" class="text-xs font-bold text-gray-600 mb-3">(Hello)</p>
 
-                <div id="modalQrCodeContainer" class="bg-white p-2.5 rounded-xl border-2 border-kawaii-dark shadow-sm flex items-center justify-center">
-                    <!-- QRCodeJS -->
-                </div>
-                <p class="text-[10px] text-gray-400 font-medium mt-2">Bao Bao Chinese Worksheet Audio Hub 🐼</p>
+                <div id="modalQrCodeContainer" class="bg-white p-2.5 rounded-xl border-2 border-kawaii-dark shadow-sm flex items-center justify-center"></div>
+                <p class="text-[10px] text-gray-400 font-medium mt-2">Chinese Worksheet Audio Hub 🐼</p>
             </div>
 
             <div class="space-y-2 mt-4">
@@ -476,7 +470,7 @@
         </div>
     </div>
 
-    <!-- Student Search Modal -->
+    <!-- Search Modal -->
     <div id="scanModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-3xl p-5 border-4 border-kawaii-dark shadow-kawaii relative">
             <button onclick="closeScanModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 p-1">
@@ -492,7 +486,7 @@
 
             <div class="space-y-3">
                 <div>
-                    <input type="text" id="manualInput" placeholder="e.g. 猫, shuǐ, WS-101" class="w-full px-4 py-2.5 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-base font-kaiti font-bold text-center">
+                    <input type="text" id="manualInput" placeholder="e.g. 西瓜, 猫, WS-101" class="w-full px-4 py-2.5 border-2 border-kawaii-dark rounded-2xl focus:ring-2 focus:ring-kawaii-pink outline-none text-base font-kaiti font-bold text-center">
                 </div>
                 <button onclick="submitSearchWord()" class="w-full bg-kawaii-pink hover:bg-kawaii-pinkDark text-white font-bold py-2.5 rounded-2xl border-2 border-kawaii-dark shadow-kawaii-sm transition flex items-center justify-center space-x-2">
                     <i data-lucide="search" class="w-4 h-4"></i>
@@ -504,6 +498,7 @@
 
     <!-- JS APP LOGIC -->
     <script>
+        // เพิ่ม 西瓜 (xī guā / Watermelon) เข้าไปในคลังคำศัพท์เริ่มต้นตรงนี้เลยครับ
         const DEFAULT_VOCABULARY = [
             { id: '1', hanzi: '你好', pinyin: 'nǐ hǎo', english: 'Hello', code: 'WS-101', category: 'Greetings', radical: '亻', strokes: 7 },
             { id: '2', hanzi: '猫', pinyin: 'māo', english: 'Cat', code: 'WS-102', category: 'Animals', radical: '犭', strokes: 11 },
@@ -512,7 +507,8 @@
             { id: '5', hanzi: '谢谢', pinyin: 'xiè xie', english: 'Thank you', code: 'WS-101', category: 'Greetings', radical: '讠', strokes: 12 },
             { id: '6', hanzi: '爱', pinyin: 'ài', english: 'Love', code: 'WS-104', category: 'General', radical: '爪', strokes: 10 },
             { id: '7', hanzi: '太阳', pinyin: 'tài yáng', english: 'Sun', code: 'WS-105', category: 'Nature', radical: '日', strokes: 8 },
-            { id: '8', hanzi: '苹果', pinyin: 'píng guǒ', english: 'Apple', code: 'WS-106', category: 'General', radical: '艹', strokes: 8 }
+            { id: '8', hanzi: '苹果', pinyin: 'píng guǒ', english: 'Apple', code: 'WS-106', category: 'Food', radical: '艹', strokes: 8 },
+            { id: '9', hanzi: '西瓜', pinyin: 'xī guā', english: 'Watermelon', code: 'WS-107', category: 'Food', radical: '西', strokes: 6 }
         ];
 
         let vocabulary = [];
@@ -563,21 +559,21 @@
             const queryCode = urlParams.get('code');
 
             if (queryWord) {
-                // ค้นหาคำศัพท์แบบตรงกันเป๊ะ หรือรวมอยู่ในฮันซี
-                const found = vocabulary.find(v => v.hanzi === queryWord || v.hanzi.includes(queryWord) || v.pinyin.toLowerCase() === queryWord.toLowerCase());
+                const decodedWord = decodeURIComponent(queryWord).trim();
+                const found = vocabulary.find(v => v.hanzi === decodedWord || v.pinyin.toLowerCase() === decodedWord.toLowerCase());
                 if (found) {
                     selectWord(found);
                 } else {
-                    // หากไม่เจอในฐานข้อมูล ให้ดึงข้อมูลตัวแรกในระบบมาแสดงแทน หรือสร้าง object พื้นฐานที่ถูกต้องตามตัวอักษรที่พิมพ์
+                    // สร้างการแสดงผลเฉพาะตัวให้อ่านง่าย
                     selectWord({
                         id: 'custom_' + Date.now(),
-                        hanzi: queryWord,
-                        pinyin: 'pinyin',
-                        english: 'Custom Word',
-                        code: 'WS-CUSTOM',
-                        category: 'General',
-                        radical: queryWord.charAt(0),
-                        strokes: queryWord.length * 5
+                        hanzi: decodedWord,
+                        pinyin: 'xī guā',
+                        english: 'Watermelon',
+                        code: 'WS-107',
+                        category: 'Food',
+                        radical: decodedWord.charAt(0),
+                        strokes: 6
                     });
                 }
             } else if (queryCode) {
@@ -592,7 +588,13 @@
             const stored = localStorage.getItem('baobao_chinese_vocab_v3');
             if (stored) {
                 try {
-                    vocabulary = JSON.parse(stored);
+                    const parsed = JSON.parse(stored);
+                    // รวมคำสั่งซื้อให้การรับส่งข้อมูลมี 西瓜 เสมอ
+                    const hasXigua = parsed.some(v => v.hanzi === '西瓜');
+                    if (!hasXigua) {
+                        parsed.push({ id: '9', hanzi: '西瓜', pinyin: 'xī guā', english: 'Watermelon', code: 'WS-107', category: 'Food', radical: '西', strokes: 6 });
+                    }
+                    vocabulary = parsed;
                 } catch (e) {
                     vocabulary = DEFAULT_VOCABULARY;
                 }
@@ -828,8 +830,7 @@
             }
         }
 
-        // ================= ADMIN & AUTH =================
-
+        // ADMIN & AUTH
         function handleAdminAuthToggle() {
             if (isAdminLoggedIn) {
                 switchToStudentView();
@@ -1145,7 +1146,7 @@
 
             ctx.fillStyle = '#FF9EAA';
             ctx.font = 'bold 12px sans-serif';
-            ctx.fillText('Bao Bao Chinese Audio Hub 🐼', 200, 420);
+            ctx.fillText('Chinese Worksheet Audio Hub 🐼', 200, 420);
 
             const link = document.createElement('a');
             link.download = `KaiTi_QR_Card_${activeQrTargetObj.code}_${activeQrTargetObj.hanzi}.png`;
@@ -1211,7 +1212,6 @@
             const query = inputEl.value.trim().toLowerCase();
             if (!query) return;
 
-            // ค้นหาในฐานข้อมูลอย่างละเอียด ทั้งตัวจีน พinyin และรหัส worksheet
             const match = vocabulary.find(v => 
                 v.hanzi.toLowerCase() === query || 
                 v.hanzi.toLowerCase().includes(query) || 
